@@ -1,65 +1,41 @@
 `timescale 1ns / 1ps
-module ALU #(
-    parameter NB_DATA = 8,
-    parameter NB_OP = 6
-    )
+
+module ALU#(
+    parameter NB_OP   = 6,
+    parameter NB_DATA = 8
+   ) 
    (
-    input  wire [NB_DATA -1 : 0] i_dataA,
-    input  wire [NB_DATA -1 : 0] i_dataB,
-    input  wire [NB_OP -1 : 0]   i_op,
-    output wire [NB_DATA-1 : 0]  o_result,
-    output wire                  o_overflow
-  );
+    input wire [NB_OP-1 : 0] i_operation,
+    input wire signed [NB_DATA-1:0] i_data_a,
+    input wire signed [NB_DATA-1:0] i_data_b,
+    output wire signed [NB_DATA-1:0] o_result
+    );
 
-    localparam ADD = 6'b100000;
-    localparam SUB = 6'b100010;
+  localparam ADD_OP = 6'b100000;
+  localparam SUB_OP = 6'b100010;
+  localparam AND_OP = 6'b100100;
+  localparam OR_OP = 6'b100101;
+  localparam XOR_OP = 6'b100110;
+  localparam SRA_OP = 6'b000011;
+  localparam SRL_OP = 6'b000010;
+  localparam NOR_OP = 6'b100111;
 
-    localparam AND = 6'b100100;
-    localparam OR  = 6'b100101;
-    localparam XOR = 6'b100110;
-    localparam NOR = 6'b100111;
-    
-    localparam SRA = 6'b000011;
-    localparam SRL = 6'b000010;
-  
-    wire [NB_DATA-1  : 0] tmpAddSub;
-    wire                  tmpOverflow;
-    reg [NB_DATA-1  : 0] tmpResult;
-     
- 
-  ADD_SUB #(
-            .NB_DATA(NB_DATA)
-           )
-  add_sub1(
-          .i_dataA(i_dataA),
-          .i_dataB(i_dataB),
-          .ctrl(i_op[1]),
-          .o_result(tmpAddSub),
-          .o_overflow(tmpOverflow)
-          );
- 
-  always  @(*)
-    begin
-      case(i_op)
-        ADD: tmpResult = tmpAddSub;      //ADD    
-        SUB: tmpResult = tmpAddSub;       //SUB 
-    
-        AND: tmpResult = i_dataA & i_dataB; //AND
-        OR: tmpResult = i_dataA | i_dataB; //OR
-        XOR: tmpResult = i_dataA ^ i_dataB; //XOR
-        NOR: tmpResult = ~( i_dataA | i_dataB); //NOR
+  reg signed [NB_DATA-1:0] res;
 
-        SRA: tmpResult = i_dataA >>> i_dataB; //SRA
-        SRL: tmpResult = i_dataA >> i_dataB; //SRL
+  always @(*) begin : alu
+    case (i_operation)
+      ADD_OP:  res = i_data_a + i_data_b;
+      SUB_OP:  res = i_data_a - i_data_b;
+      AND_OP:  res = i_data_a & i_data_b;
+      OR_OP:   res = i_data_a | i_data_b;
+      XOR_OP:  res = i_data_a ^ i_data_b;
+      SRA_OP:  res = i_data_a >>> i_data_b;  // aritmetico: el nuevo bit mantiene el signo
+      SRL_OP:  res = i_data_a >> i_data_b;  // logico: el nuevo bit es 0
+      NOR_OP:  res = ~(i_data_a | i_data_b);
+      default: res = 8'hff;
+    endcase
+  end
 
-        default : tmpResult = {NB_DATA {1'b1}};
-       
- endcase
-end
+  assign o_result = res;
 
- assign o_result = tmpResult;
- assign o_overflow=(i_op==ADD |i_op==SUB) ? tmpOverflow : 0;
-
-endmodule        
-
-     
+endmodule
