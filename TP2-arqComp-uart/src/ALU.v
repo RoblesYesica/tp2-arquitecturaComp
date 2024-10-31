@@ -29,8 +29,8 @@ module ALU#(
       AND_OP:  res = i_data_a & i_data_b;
       OR_OP:   res = i_data_a | i_data_b;
       XOR_OP:  res = i_data_a ^ i_data_b;
-      SRA_OP:  res = i_data_a >>> i_data_b;  // aritmetico: el nuevo bit mantiene el signo
-      SRL_OP:  res = i_data_a >> i_data_b;  // logico: el nuevo bit es 0
+      SRA_OP:  res = i_data_a >>> i_data_b;  // 
+      SRL_OP:  res = i_data_a >> i_data_b;  // 
       NOR_OP:  res = ~(i_data_a | i_data_b);
       default: res = 8'hff;
     endcase
