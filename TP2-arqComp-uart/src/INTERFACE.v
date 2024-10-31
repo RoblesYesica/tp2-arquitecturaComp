@@ -107,8 +107,6 @@ module INTERFACE #(
        if (alu_data_ready) begin
           next_tx_data = i_alu_result;   // Asignar resultado de la ALU
         end
-        // Enviar el resultado de la ALU
-//        next_tx_data = i_alu_data_out;   // Resultado de la ALU
         
         next_tx_enable = 1'b1;            // Iniciar transmisión
         if (i_tx_done) begin  // Solo cambiar de estado cuando la transmisión esté completa
